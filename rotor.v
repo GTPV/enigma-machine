@@ -18,17 +18,4 @@ module rotor(
 );
 	reg [31:0]cnt, [31:0]delaycnt;
 
-    always @(*) begin
-        if(reset_n == 1'b0)
-            cnt = 0;
-            delaycnt = 0;
-    end
-
-	always @(posedge clk and en) begin
-		if(cnt == 26)
-			cnt = 0;
-		else
-			cnt = cnt + 1;
-	end
-
 endmodule
