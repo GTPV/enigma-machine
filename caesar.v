@@ -9,7 +9,7 @@ module caesar(
 
     always @ (*)
     begin
-        else if(sel == 0)
+        if(sel == 0)
             res[7] = idx_in[207]; res[6] = idx_in[206]; res[5] = idx_in[205]; res[4] = idx_in[204]; res[3] = idx_in[203]; res[2] = idx_in[202]; res[1] = idx_in[201]; res[0] = idx_in[200];
         else if(sel == 1)
             res[7] = idx_in[199]; res[6] = idx_in[198]; res[5] = idx_in[197]; res[4] = idx_in[196]; res[3] = idx_in[195]; res[2] = idx_in[194]; res[1] = idx_in[193]; res[0] = idx_in[192];
