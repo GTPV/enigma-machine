@@ -8,6 +8,7 @@ module caesar(
 );
 
     always @ (*) begin
+        if(sel >= 26) sel = sel - 26;
         if(sel == 0) begin
                 res[7] = idx_in[207]; res[6] = idx_in[206]; res[5] = idx_in[205]; res[4] = idx_in[204]; res[3] = idx_in[203]; res[2] = idx_in[202]; res[1] = idx_in[201]; res[0] = idx_in[200];
         end
