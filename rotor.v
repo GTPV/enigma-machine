@@ -67,7 +67,7 @@ module rotor(
             end
             if(done == 1) begin
                 dout <= Dout;
-                done <= 0;
+                done <= 1'b0;
             end
         end
     end
@@ -78,7 +78,7 @@ module rotor(
 
             //caesar(.idx_in(Idx_in), .sel(Sel), .res(Dout));
             if(dec == 0) begin
-                Sel = Din + Shifted;
+                Sel = (Din-65) + Shifted;
                 if(Sel >= 26) Sel = Sel - 26;
                 Dout[7:0] = idx_in[207-(Sel*8):200-(Sel*8)];
             end
@@ -87,7 +87,7 @@ module rotor(
                     if(Din[7:0] == idx_in[207-(i*8):200-(i*8)]) begin
                         Sel = i - Shifted;
                         if(Sel < 0) Sel = Sel + 26;
-                        Dout[7:0] = idx_in[207-(Sel*8):200-(Sel*8)];
+                        Dout[7:0] = Sel + 65;
                     end
                 end
             end
