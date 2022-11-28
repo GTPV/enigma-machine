@@ -17,6 +17,9 @@ module reflector(
     reg [31:0] Din;
 
     integer i;
+    reg cur, nxt;
+    //S0 : none, S1 : output
+    localparam S0=1'b0, S1=1'b1;
 
     always @(posedge clk or negedge reset_n)
     begin
@@ -24,33 +27,57 @@ module reflector(
             for(i=0;i<208;i=i+1) Idx_in[i]<=1'b0;
         end
         else begin 
+            cur <= nxt;
             if(set) begin 
                 Idx_in<=idx_in;
             end
             if(valid) begin
                 Din[7:0] <= din[7:0];
             end
-            if(done)
-            begin
-                dout<=out_reg;
-                done<=1'b0;
-            end
         end
     end
-    always @(*)
-    begin
-        if(!dec)
-        begin
-            out_reg<=Idx_in[200-(Din-65)*8 +: 8];
-        end
-        else
-        begin
-            for(i=0;i<26;i=i+1)
-            begin
-                if(Din==Idx_in[200-i*8 +: 8]) out_reg<=Idx_in[200-i*8 +: 8];
+
+    //state transition
+    always @(*) begin
+        case(cur)
+
+            S0 : begin
+                if(valid) nxt <= S1;
             end
-        end
-        done<=1'b1;
+
+            S1 : begin
+                nxt <= S0;
+            end
+
+            default : ;
+        endcase
+    end
+
+    //Moore output
+    always @(*) begin
+        case(cur)
+
+            S0 : begin
+                done <= 0;
+                dout <= 8'b00000000;
+            end
+
+            S1 : begin
+                done <= 1;
+                if(dec == 0) begin
+                    dout <= Idx_in[200 - (8*(Din-65)) +: 8];
+                end
+                else begin
+                    for(i = 0; i < 26; i = i+1) begin
+                        if(Din[7:0] == Idx_in[200 - (8*i) +: 8]) begin
+                            dout <= 65 + i;
+                        end
+                    end
+                else
+            end
+
+            default : ;
+        endcase
     end
 
 endmodule

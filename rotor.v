@@ -74,8 +74,10 @@ module rotor(
     always @(*) begin
         case(cur)
             S0 : begin
-                if(dec == 0) nxt <= S1;
-                else nxt <= S3;
+                if(valid) begin
+                    if(dec == 0) nxt <= S1;
+                    else nxt <= S3;
+                end
             end
             S1 : begin
                 if(Delaycnt >= delay) begin
@@ -114,16 +116,16 @@ module rotor(
             S2 : begin
                 done <= 1;
                 if((Din - 65 + Shifted) >= 26) begin
-                    dout = idx_in[200-(8*(Din-65+Shifted-26)) +: 8];
+                    dout = Idx_in[200-(8*(Din-65+Shifted-26)) +: 8];
                 end
                 else begin
-                    dout = idx_in[200-(8*(Din-65+Shifted)) +: 8];
+                    dout = Idx_in[200-(8*(Din-65+Shifted)) +: 8];
                 end
             end
 
             S3 : begin
                 for(i = 0; i < 26; i = i+1) begin
-                    if(Din[7:0] == idx_in[200-(i*8) +: 8]) begin
+                    if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
                         if((i - Shifted) >= 0) begin
                             Sel <= i - Shifted;
                         end
