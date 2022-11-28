@@ -9,7 +9,7 @@ module top(
     input valid,
     input[7:0] din,
     input dec,
-    output[7:0] dout,
+    output [7:0] dout,
     output done,
 
     input[31:0] first_offset,
@@ -41,17 +41,25 @@ module top(
             Done <= 1'b0;
         end
         if(Done == 1'b1) begin
-            dout <= Dout;
             Done <= 1'b0;
         end
     end
 
+    always @(posedge done_11) begin
+        Done <= done_11;
+        Dout <= dout_11;
+    end
+
+    assign done = Done;
+    assign dout = Dout;
+
+
     rotor Rotor1(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid), .rot(1'b1), .din(din), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_1), .done(done_1));
     rotor Rotor2(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_1), .rot(1'b1), .din(dout_1), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_2), .done(done_2));
     rotor Rotor3(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_2), .rot(1'b1), .din(dout_2), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_3), .done(dont_3));
-    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(done_3) .din(dout_3), .dec(dec), .dout(dout_reflector), .done(done_reflector));
+    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(done_3), .din(dout_3), .dec(dec), .dout(dout_reflector), .done(done_reflector));
     rotor Rotor33(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_reflector), .rot(1'b1), .din(dout_reflector), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_33), .done(done_33));
     rotor Rotor22(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_33), .rot(1'b1), .din(dout_33), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_22), .done(done_22));
-    rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_22), .rot(1'b1), .din(dout_22), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(Dout), .done(Done));
+    rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_22), .rot(1'b1), .din(dout_22), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_11), .done(done_11));
 
 endmodule
