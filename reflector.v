@@ -11,5 +11,35 @@ module reflector(
     output reg [7:0] dout,
     output reg done
 );
+    reg [207:0] idx;
+    reg [7:0] out_reg;
+    always @(posedge clk)
+    begin
+        for(integer i=0;i<208;i=i+1) idx[i]<=1'b0;
+        if(done)
+        begin
+            dout<=out_reg;
+            done<=1'b0;
+        end
+    end
+    always @(*)
+    begin
+        if(set) idx<=idx_in;
+        if(valid)
+        begin
+            if(!dec)
+            begin
+                out_reg<=idx[207-(din-65)*8:200-(din-65)*8];
+            end
+            else
+            begin
+                for(integer i=0;i<26;i=i+1)
+                begin
+                    if(din==idx[207-i*8:200-i*8]) out_reg<=idx[207-i*8:200-i*8];
+                end
+            end
+            done<=1'b1;
+        end
+    end
 
 endmodule
