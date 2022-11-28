@@ -21,8 +21,9 @@ module rotor(
     reg [31:0] Delay;
     reg [207:0] Idx_in;
 
-    reg [31:0] Sel;
-    reg [31:0] Delaycnt;
+    integer Shifted;
+    integer Sel;
+    integer Delaycnt;
     reg [7:0] Dout;
 
     always @(posedge clk or negedge reset_n) begin
@@ -31,6 +32,7 @@ module rotor(
             Offset = 0;
             Delay = 0;
             Idx_in = 0;
+            Shifted = 0;
             Sel = 0;
             Delaycnt = 0;
             Dout = 0;
@@ -43,10 +45,21 @@ module rotor(
             end
             if(en == 1) begin
                 Delaycnt = Delaycnt + 1;
-                Sel = Sel + Offset;
-                if(Sel >= 26) begin
-                    Sel = Sel - 26;
+
+                //rotate roter
+                if(dec == 0) begin
+                    Shifted = Shifted + Offset;
+                    if(Shifted >= 26) begin
+                        Shifted = Shifted - 26;
+                    end
                 end
+                else begin
+                    Shifted = Shifted + 26 - Offset;
+                    if(Shifted >= 26) begin
+                        Shifted = Shifted - 26;
+                    end
+                end
+
             end
             if(valid == 1) begin
                 Din = din;
@@ -62,7 +75,23 @@ module rotor(
 
     always @(*) begin
         if(Delaycnt >= Delay) begin
-            caesar(.idx_in(Idx_in), .sel(Sel), .res(Dout));
+
+            //caesar(.idx_in(Idx_in), .sel(Sel), .res(Dout));
+            if(dec == 0) begin
+                Sel = Din + Shifted;
+                if(Sel >= 26) Sel = Sel - 26;
+                Dout[7:0] = idx_in[207-(Sel*8):200-(Sel*8)];
+            end
+            else begin
+                for(integer i = 0; i < 26; i = i+1) begin
+                    if(Din[7:0] == idx_in[207-(i*8):200-(i*8)]) begin
+                        Sel = i - Shifted;
+                        if(Sel < 0) Sel = Sel + 26;
+                        Dout[7:0] = idx_in[207-(Sel*8):200-(Sel*8)];
+                    end
+                end
+            end
+
             done = 1;
         end
     end
