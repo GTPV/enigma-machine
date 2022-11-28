@@ -9,7 +9,7 @@ module caesar(
 
     always @ (*) begin
         if(sel >= 26) sel = sel - 26;
-        res[7:0] = idx_in[207-(sel*8):200-(sel*8)];
+        else res[7:0] = idx_in[207-(sel*8):200-(sel*8)];
     end
 
 endmodule
