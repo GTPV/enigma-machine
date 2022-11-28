@@ -1,3 +1,4 @@
+//rotor.v
 `timescale 1ns / 1ps
 
 module rotor(
@@ -31,11 +32,11 @@ module rotor(
             Din = 0;
             Offset = 0;
             Delay = 0;
-            Idx_in = 0;
+            for(integer i = 0; i < 208; i = i+1) Idx_in[i] <= 1'b0;
             Shifted = 0;
             Sel = 0;
             Delaycnt = 0;
-            Dout = 0;
+            Dout <= 8'b00000000;
         end
         else begin
             if(set == 1) begin
@@ -76,12 +77,13 @@ module rotor(
     always @(*) begin
         if(Delaycnt >= Delay) begin
 
-            //caesar(.idx_in(Idx_in), .sel(Sel), .res(Dout));
+            //encryption
             if(dec == 0) begin
                 Sel = (Din-65) + Shifted;
                 if(Sel >= 26) Sel = Sel - 26;
                 Dout[7:0] = idx_in[207-(Sel*8):200-(Sel*8)];
             end
+            //decryption
             else begin
                 for(integer i = 0; i < 26; i = i+1) begin
                     if(Din[7:0] == idx_in[207-(i*8):200-(i*8)]) begin

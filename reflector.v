@@ -1,3 +1,4 @@
+//reflector.v
 `timescale 1ns / 1ps
 
 module reflector(
@@ -13,18 +14,22 @@ module reflector(
 );
     reg [207:0] idx;
     reg [7:0] out_reg;
-    always @(posedge clk)
+    always @(posedge clk or negedge reset_n)
     begin
-        for(integer i=0;i<208;i=i+1) idx[i]<=1'b0;
-        if(done)
-        begin
-            dout<=out_reg;
-            done<=1'b0;
+        if(reset_n == 0) begin
+            for(integer i=0;i<208;i=i+1) idx[i]<=1'b0;
+        end
+        else begin 
+            if(set) idx<=idx_in;
+            if(done)
+            begin
+                dout<=out_reg;
+                done<=1'b0;
+            end
         end
     end
     always @(*)
     begin
-        if(set) idx<=idx_in;
         if(valid)
         begin
             if(!dec)
