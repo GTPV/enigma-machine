@@ -73,7 +73,7 @@ module reflector(
                             dout <= 65 + i;
                         end
                     end
-                else
+				end
             end
 
             default : ;
