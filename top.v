@@ -50,6 +50,7 @@ module top(
     end
 
     assign Done = done_11;
+    assign Dout = dout_11;
 
     //state transition
     always @(*) begin
