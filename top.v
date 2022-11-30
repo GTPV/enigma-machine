@@ -32,27 +32,59 @@ module top(
     //dout_11 = dout
     wire dout_reflector;
 
+    reg [7:0] dout;
     reg [7:0] Dout;
     reg Done;
+
+    reg cur, nxt;
+    localparam S0=1'b0, S1=1'b1;
 
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 1'b0) begin
             Dout <= 8'b00000000;
             Done <= 1'b0;
         end
-        if(Done == 1'b1) begin
-            Done <= 1'b0;
+        else begin
+            cur <= nxt;
         end
     end
 
-    always @(posedge done_11) begin
-        Done <= done_11;
-        Dout <= dout_11;
+    assign Done = done_11;
+
+    //state transition
+    always @(*) begin
+        case(cur)
+
+            S0: begin
+                if(Done) nxt <= S1;
+                else nxt <= S0;
+            end
+
+            S1: begin
+                nxt <= S0;
+            end
+
+            default: ;
+        endcase
     end
 
-    assign done = Done;
-    assign dout = Dout;
+    //Moore output
+    always @(*) begin
+        case(cur)
 
+            S0 : begin
+                done = 0;
+                dout = 8'b00000000;
+            end
+
+            S1 : begin
+                done = 1;
+                dout = Dout;
+            end
+
+            default: ;
+        endcase
+    end
 
     rotor Rotor1(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid), .rot(1'b1), .din(din), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_1), .done(done_1));
     rotor Rotor2(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_1), .rot(1'b1), .din(dout_1), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_2), .done(done_2));
