@@ -22,9 +22,9 @@ module rotor(
     reg [31:0] Delay;
     reg [207:0] Idx_in;
 
-    integer Shifted;
-    integer Sel;
-    integer Delaycnt;
+    reg [31:0] Shifted;
+    reg [31:0] Sel;
+    reg [31:0] Delaycnt;
     integer i;
 
     reg [2:0] cur, nxt;
