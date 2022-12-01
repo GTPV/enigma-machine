@@ -34,9 +34,9 @@ module rotor(
     //setting-reset values
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
-            Offset <= 0;
-            Delay <= 0;
-            Idx_in <= 0;
+            Offset <= {32{1'b0}};
+            Delay <= {32{1'b0}};
+            Idx_in <= {208{1'b0}};
         end
         else begin
             if(set == 1) begin
@@ -74,7 +74,7 @@ module rotor(
     //rotate rotor
     always @(posedge clk or negedge reset_n) begin
         if(reset_n = 0) begin
-            Shifted = 0;
+            Shifted = 32'd0;
         end
         else begin
             if(en == 1) begin
