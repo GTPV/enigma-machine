@@ -21,28 +21,31 @@ module reflector(
     //S0 : none, S1 : output
     localparam S0=1'b0, S1=1'b1;
 
-    always @(posedge clk or negedge reset_n)
-    begin
+    //setting
+    always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
-            for(i=0;i<208;i=i+1) Idx_in[i]<=1'b0;
+            Idx_in <= {208{1'b0}};
+            Din <= {32{1'b0}};
         end
-        else begin 
-            cur <= nxt;
-            if(set) begin 
-                Idx_in<=idx_in;
-            end
-            if(valid) begin
-                Din[7:0] <= din[7:0];
-            end
+        else begin
+            if(set == 1) Idx_in <= idx_in;
+            if(valid == 1) Din <= din;
         end
     end
 
     //state transition
+    always @(posedge clk or negedge reset_n) begin
+        if(reset_n == 0) cur <= S0;
+        else cur <= nxt;
+    end
+
+    //decide next state
     always @(*) begin
         case(cur)
 
             S0 : begin
                 if(valid) nxt <= S1;
+                else nxt <= S0;
             end
 
             S1 : begin
