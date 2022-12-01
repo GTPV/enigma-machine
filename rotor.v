@@ -21,7 +21,6 @@ module rotor(
     reg [31:0] Offset;
     reg [31:0] Delay;
     reg [207:0] Idx_in;
-    reg [7:0] Dout;
 
     integer Shifted;
     integer Sel;
@@ -32,45 +31,66 @@ module rotor(
     //S0 : reset, S1 : encoding ongoing, S2 : encoding done, S3 : decoding ongoing, S4 : decoding done
     localparam S0=3'b000, S1=3'b001, S2=3'b010, S3=3'b011, S4=3'b100;
 
+    //setting-reset values
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
-            cur <= S0;
-            Delaycnt = 0;
+            Offset <= 0;
+            Delay <= 0;
+            Idx_in <= 0;
         end
         else begin
-            cur <= nxt;
             if(set == 1) begin
                 Offset <= offset;
                 Delay <= delay;
                 Idx_in <= idx_in;
             end
-            if(en == 1) begin
-                Delaycnt = Delaycnt + 1;
-
-                //rotate roter
-                if(dec == 0) begin
-                    Shifted = Shifted + Offset;
-                    if(Shifted >= 26) begin
-                        Shifted = Shifted - 26;
-                    end
-                end
-                //reverse rotate roter
-                else begin
-                    Shifted = Shifted + 26 - Offset;
-                    if(Shifted >= 26) begin
-                        Shifted = Shifted - 26;
-                    end
-                end
-
-            end
             if(valid == 1) begin
-                Din[7:0] <= din[7:0];
-                Delaycnt = 1;
+                Din <= din;
             end
         end
     end
 
     //state transition
+    always @(posedge clk or negedge reset_n) begin
+        if(reset_n == 0) cur <= S0;
+        else cur <= nxt;
+    end
+
+    //counter(Delaycnt)
+    always @(posedge clk or negedge reset_n) begin
+        if(reset_n = 0) begin
+            Delaycnt = 1;
+        end
+        else begin
+            if(en == 1) begin
+                Delaycnt = Delaycnt + 1;
+            end
+            if(valid == 1) begin
+                Delaycnt = 1;
+            end
+        end
+    end
+
+    //rotate rotor
+    always @(posedge clk or negedge reset_n) begin
+        if(reset_n = 0) begin
+            Shifted = 0;
+        end
+        else begin
+            if(en == 1) begin
+                if(dec == 0) begin
+                    Shifted = Shifted + Offset;
+                    if(Shifted >= 26) Shifted = Shifted - 26;
+                end
+                else begin
+                    Shifted = Shifted + 26 - Offset;
+                    if(Shifted >= 26) Shifted = Shifted - 26;
+                end
+            end
+        end
+    end
+
+    //next state decision
     always @(*) begin
         case(cur)
             S0 : begin
