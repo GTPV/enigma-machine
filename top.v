@@ -28,9 +28,14 @@ module top(
     //done_11 = Done
     wire done_reflector;
 
-    wire dout_1, dout_2, dout_3, dout_11, dout_22, dout_33;
+    wire [7:0] dout_1;
+    wire [7:0] dout_2;
+    wire [7:0] dout_3;
+    wire [7:0] dout_11;
+    wire [7:0] dout_22;
+    wire [7:0] dout_33;
     //dout_11 = dout
-    wire dout_reflector;
+    wire [7:0] dout_reflector;
 
     reg [7:0] dout;
     reg done;
