@@ -27,6 +27,8 @@ module rotor(
     reg [31:0] Delaycnt;
     integer i;
 
+    reg [7:0] dout;
+
 
     reg [2:0] cur, nxt;
     //S0 : reset, S1 : encoding ongoing, S2 : encoding done, S3 : decoding ongoing, S4 : decoding done
@@ -126,21 +128,21 @@ module rotor(
 
             S0 : begin
                 done <= 0;
-                dout = 8'b00000000;
+                dout <= 8'b00000000;
             end
 
             S1 : begin
                 done <= 0;
-                dout = 8'b00000000;
+                dout <= 8'b00000000;
             end
 
             S2 : begin
                 done <= 1;
                 if((Din - 65 + Shifted) >= 26) begin
-                    dout = Idx_in[200-(8*(Din-65+Shifted-26)) +: 8];
+                    dout <= Idx_in[200-(8*(Din-65+Shifted-26)) +: 8];
                 end
                 else begin
-                    dout = Idx_in[200-(8*(Din-65+Shifted)) +: 8];
+                    dout <= Idx_in[200-(8*(Din-65+Shifted)) +: 8];
                 end
             end
 
@@ -156,12 +158,12 @@ module rotor(
                     end
                 end
                 done <= 0;
-                dout = 8'b00000000;
+                dout <= 8'b00000000;
             end
 
             S4 : begin
                 done <= 1;
-                dout = Sel + 65;
+                dout <= Sel + 65;
             end
 
             default: ;
