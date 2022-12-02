@@ -32,6 +32,8 @@ module top(
     //dout_11 = dout
     wire dout_reflector;
 
+    reg [7:0] dout;
+    reg done;
     reg [7:0] Dout;
     reg Done;
 
@@ -93,13 +95,13 @@ module top(
         case(cur)
 
             S0 : begin
-                done = 0;
-                dout = 8'b00000000;
+                done <= 0;
+                dout <= 8'b00000000;
             end
 
             S1 : begin
-                done = 1;
-                dout = Dout;
+                done <= 1;
+                dout <= Dout;
             end
 
             default: ;
