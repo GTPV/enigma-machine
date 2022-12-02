@@ -35,9 +35,6 @@ module top(
     reg [7:0] Dout;
     reg Done;
 
-    assign Done = done_11;
-    assign Dout = dout_11;
-
     rotor Rotor1(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid), .rot(1'b1), .din(din), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_1), .done(done_1));
     rotor Rotor2(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_1), .rot(1'b1), .din(dout_1), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_2), .done(done_2));
     rotor Rotor3(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_2), .rot(1'b1), .din(dout_2), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_3), .done(dont_3));
@@ -56,6 +53,10 @@ module top(
         if(reset_n == 0) begin
             Dout <= 8'b00000000;
             Done <= 1'b0;
+        end
+        else begin
+            Dout <= dout_11;
+            Done <= done_11;
         end
     end
 
