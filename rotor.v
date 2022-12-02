@@ -55,7 +55,10 @@ module rotor(
 
     //state transition
     always @(posedge clk or negedge reset_n) begin
-        if(reset_n == 0) cur <= S0;
+        if(reset_n == 0) begin
+            cur <= S0;
+            nxt <= S0;
+        end
         else cur <= nxt;
     end
 
