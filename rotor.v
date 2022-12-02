@@ -106,7 +106,7 @@ module rotor(
                 end
             end
             S1 : begin
-                if(Delaycnt >= delay) begin
+                if(Delaycnt >= delay - 1) begin
                     nxt <= S2;
                 end
             end
@@ -114,7 +114,7 @@ module rotor(
                 nxt <= S0;
             end
             S3 : begin
-                if(Delaycnt >= delay) begin
+                if(Delaycnt >= delay - 1) begin
                     nxt <= S4;
                 end
             end
@@ -141,7 +141,7 @@ module rotor(
 
             S2 : begin
                 done <= 1;
-                if(((Din - 65) >= Shifted) begin
+                if((Din - 65) >= Shifted) begin
                     dout <= Idx_in[200-(8*(Din-65-Shifted)) +: 8];
                 end
                 else begin
