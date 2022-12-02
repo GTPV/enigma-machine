@@ -27,6 +27,7 @@ module rotor(
     reg [31:0] Delaycnt;
     integer i;
 
+
     reg [2:0] cur, nxt;
     //S0 : reset, S1 : encoding ongoing, S2 : encoding done, S3 : decoding ongoing, S4 : decoding done
     localparam S0=3'b000, S1=3'b001, S2=3'b010, S3=3'b011, S4=3'b100;
@@ -58,7 +59,7 @@ module rotor(
 
     //counter(Delaycnt)
     always @(posedge clk or negedge reset_n) begin
-        if(reset_n = 0) begin
+        if(reset_n == 0) begin
             Delaycnt = 1;
         end
         else begin
@@ -73,7 +74,7 @@ module rotor(
 
     //rotate rotor
     always @(posedge clk or negedge reset_n) begin
-        if(reset_n = 0) begin
+        if(reset_n == 0) begin
             Shifted = 32'd0;
         end
         else begin
