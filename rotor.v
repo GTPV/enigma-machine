@@ -141,11 +141,11 @@ module rotor(
 
             S2 : begin
                 done <= 1;
-                if((Din - 65 + Shifted) >= 26) begin
-                    dout <= Idx_in[200-(8*(Din-65+Shifted-26)) +: 8];
+                if(((Din - 65) >= Shifted) begin
+                    dout <= Idx_in[200-(8*(Din-65-Shifted)) +: 8];
                 end
                 else begin
-                    dout <= Idx_in[200-(8*(Din-65+Shifted)) +: 8];
+                    dout <= Idx_in[200-(8*(Din +26-65-Shifted)) +: 8];
                 end
             end
 
