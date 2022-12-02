@@ -152,11 +152,11 @@ module rotor(
             S3 : begin
                 for(i = 0; i < 26; i = i+1) begin
                     if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
-                        if((i - Shifted) >= 0) begin
-                            Sel <= i - Shifted;
+                        if((i + Shifted) >= 26) begin
+                            Sel <= i + Shifted - 26;
                         end
                         else begin
-                            Sel <= i - Shifted + 26;
+                            Sel <= i + Shifted;
                         end
                     end
                 end
