@@ -37,10 +37,6 @@ module top(
     //dout_11 = dout
     wire [7:0] dout_reflector;
 
-    reg [7:0] dout;
-    reg done;
-    reg [7:0] Dout;
-    reg Done;
 
     rotor Rotor1(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid), .rot(1'b1), .din(din), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_1), .done(done_1));
     rotor Rotor2(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_1), .rot(1'b1), .din(dout_1), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_2), .done(done_2));
@@ -48,7 +44,7 @@ module top(
     reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(done_3), .din(dout_3), .dec(dec), .dout(dout_reflector), .done(done_reflector));
     rotor Rotor33(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_reflector), .rot(1'b1), .din(dout_reflector), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_33), .done(done_33));
     rotor Rotor22(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_33), .rot(1'b1), .din(dout_33), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_22), .done(done_22));
-    rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_22), .rot(1'b1), .din(dout_22), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_11), .done(done_11));
+    rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_22), .rot(1'b1), .din(dout_22), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout), .done(done));
 
     //S0 : calculating...
     //S1 : done -> output
@@ -100,13 +96,13 @@ module top(
         case(cur)
 
             S0 : begin
-                done <= 0;
-                dout <= 8'b00000000;
+                //done <= 0;
+                //dout <= 8'b00000000;
             end
 
             S1 : begin
-                done <= 1;
-                dout <= Dout;
+                //done <= 1;
+                //dout <= Dout;
             end
 
             default: ;
