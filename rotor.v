@@ -65,14 +65,14 @@ module rotor(
     //counter(Delaycnt)
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
-            Delaycnt = 1;
+            Delaycnt <= 1;
         end
         else begin
             if(en == 1) begin
-                Delaycnt = Delaycnt + 1;
+                Delaycnt <= Delaycnt + 1;
             end
             if(valid == 1) begin
-                Delaycnt = 1;
+                Delaycnt <= 1;
             end
         end
     end
@@ -106,7 +106,7 @@ module rotor(
                 end
             end
             S1 : begin
-                if(Delaycnt >= delay - 1) begin
+                if(Delaycnt + 2 >= delay) begin
                     nxt <= S2;
                 end
             end
@@ -114,7 +114,7 @@ module rotor(
                 nxt <= S0;
             end
             S3 : begin
-                if(Delaycnt >= delay - 1) begin
+                if(Delaycnt + 2 >= delay) begin
                     nxt <= S4;
                 end
             end
@@ -141,12 +141,17 @@ module rotor(
 
             S2 : begin
                 done <= 1;
-                //Din - 65 + Shifted
-                if(Din - 65 + Shifted >= 26) begin
-                    dout <= Idx_in[200-(8*(Din - 65 + Shifted - 26)) +: 8];
+                //Din - 65 + (Shifted + Offset)
+                if(Din - 65 + (Shifted + Offset) >= 26) begin
+                    if(Din - 65 + (Shifted + Offset) >= 52) begin
+                        dout <= Idx_in[200-(8*(Din - 65 + (Shifted + Offset) - 52)) +: 8];
+                    end
+                    else begin
+                        dout <= Idx_in[200-(8*(Din - 65 + (Shifted + Offset) - 26)) +: 8];
+                    end
                 end
                 else begin
-                    dout <= Idx_in[200-(8*(Din - 65 + Shifted)) +: 8];
+                    dout <= Idx_in[200-(8*(Din - 65 + (Shifted + Offset))) +: 8];
                 end
             end
 
