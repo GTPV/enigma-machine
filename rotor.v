@@ -26,6 +26,7 @@ module rotor(
     reg [31:0] Sel;
     reg [31:0] Delaycnt;
     integer i;
+    reg decrypted;
 
     reg [7:0] dout;
 
@@ -59,7 +60,9 @@ module rotor(
             cur <= S0;
             nxt <= S0;
         end
-        else cur <= nxt;
+        else begin
+            cur <= nxt;
+        end
     end
 
     //counter(Delaycnt)
@@ -132,6 +135,8 @@ module rotor(
             S0 : begin
                 done <= 0;
                 dout <= 8'b00000000;
+                decrypted <= 1'b0;
+                Sel <= 0;
             end
 
             S1 : begin
@@ -156,23 +161,25 @@ module rotor(
             end
 
             S3 : begin
-                for(i = 0; i < 26; i = i+1) begin
-                    if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
-                        if((i + Shifted) >= 26) begin
-                            Sel <= i + Shifted - 26;
-                        end
-                        else begin
-                            Sel <= i + Shifted;
+                if(!decrypted) begin
+                    for(i = 0; i < 26; i = i+1) begin
+                        if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
+                            if(i >= (Shifted + Offset)) begin
+                                Sel <= i - (Shifted + Offset) + 65;
+                            end
+                            else begin
+                                Sel <= 26 + i - (Shifted + Offset) + 65;
+                            end
                         end
                     end
+                    decrypted <= 1'b1;
                 end
                 done <= 0;
-                dout <= 8'b00000000;
             end
 
             S4 : begin
                 done <= 1;
-                dout <= Sel + 65;
+                dout <= Sel;
             end
 
             default: ;
