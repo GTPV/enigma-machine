@@ -57,45 +57,41 @@ module top(
     wire valid_3;
     wire [7:0] din_3;
     DFF Done_Temp_2_3(.clk(clk), .reset_n(reset_n), .Q(valid_3), .D(done_2));
-    DFF8 Dout_Temp_1_2(.clk(clk), .reset_n(reset_n), .Q(din_3), .D(dout_2));
+    DFF8 Dout_Temp_2_3(.clk(clk), .reset_n(reset_n), .Q(din_3), .D(dout_2));
 
     rotor Rotor3(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_3), .rot(1'b1), .din(din_3), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_3), .done(done_3));
 
     wire valid_reflector;
     wire [7:0] din_reflector;
     DFF Done_Temp_3_reflector(.clk(clk), .reset_n(reset_n), .Q(valid_reflector), .D(done_3));
-    DFF8 Dout_Temp_1_2(.clk(clk), .reset_n(reset_n), .Q(din_reflector), .D(dout_3));
+    DFF8 Dout_Temp_3_reflector(.clk(clk), .reset_n(reset_n), .Q(din_reflector), .D(dout_3));
 
-    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(done_3), .din(din_reflector), .dec(dec), .dout(dout_reflector), .done(done_reflector));
+    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(valid_reflector), .din(din_reflector), .dec(dec), .dout(dout_reflector), .done(done_reflector));
 
     rotor Rotor33(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_reflector), .rot(1'b1), .din(dout_reflector), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_33), .done(done_33));
 
     wire valid_22;
     wire [7:0] din_22;
     DFF Done_Temp_33_22(.clk(clk), .reset_n(reset_n), .Q(valid_22), .D(done_33));
-    DFF8 Dout_Temp_1_2(.clk(clk), .reset_n(reset_n), .Q(din_22), .D(dout_33));
+    DFF8 Dout_Temp_33_22(.clk(clk), .reset_n(reset_n), .Q(din_22), .D(dout_33));
 
     rotor Rotor22(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_22), .rot(1'b1), .din(din_22), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_22), .done(done_22));
 
     wire valid_11;
     wire [7:0] din_11;
     DFF Done_Temp_22_11(.clk(clk), .reset_n(reset_n), .Q(valid_11), .D(done_22));
-    DFF8 Dout_Temp_1_2(.clk(clk), .reset_n(reset_n), .Q(din_11), .D(dout_22));
+    DFF8 Dout_Temp_11_22(.clk(clk), .reset_n(reset_n), .Q(din_11), .D(dout_22));
 
     rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_11), .rot(1'b1), .din(din_11), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout), .done(done));
 
 endmodule
 
 module DFF(
-    clk, reset_n, Q, D;
+    input clk,
+    input reset_n,
+    input D,
+    output reg Q
 );
-    input clk;
-    input reset_n;
-    input D;
-
-    output Q;
-    reg Q;
-
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
             Q <= 1'b0;
@@ -107,15 +103,11 @@ module DFF(
 endmodule
 
 module DFF8(
-    clk, reset_n, Q[7:0], D[7:0];
+    input clk,
+    input reset_n,
+    input [7:0] D,
+    output reg [7:0] Q
 );
-    input clk;
-    input reset_n;
-    input D[7:0];
-
-    output Q[7:0];
-    reg Q[7:0];
-
     always @(posedge clk or negedge reset_n) begin
         if(reset_n == 0) begin
             Q <= 8'b00000000;
