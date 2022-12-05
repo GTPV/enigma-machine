@@ -39,26 +39,36 @@ module top(
     wire [7:0] wdout3;
     wire wdone3;
 
+    wire [7:0] wdinreflector;
+    wire wvalidreflector;
     wire [7:0] wdoutreflector;
     wire wdonereflector;
 
-    wire [7;0] wdout1_din2;
+    wire [7:0] wdout1_din2;
     wire wdone1_valid2;
 
-    wire [7;0] wdout2_din3;
+    wire [7:0] wdout2_din3;
     wire wdone2_valid3;
 
-    wire [7;0] wdout3_dinreflector;
+    wire [7:0] wdout3_dinreflector;
     wire wdone3_validreflector;
+
+    wire dff_reset;
+
+    assign dff_reset = !((!reset_n) | valid);
+
 
     reg reflected;
 
-    always @(posedge valid or posedge wdone3_validreflector) begin
-        if(valid == 1) begin
-            reflected <= 0;
+    always @(posedge valid or posedge wdonereflector or negedge reset_n) begin
+        if(reset_n == 0) begin
+            reflected <= 1'b0;
         end
-        else if(wdone3_validreflector) begin
-            reflected <= 1;
+        else if(valid == 1) begin
+            reflected <= 1'b0;
+        end
+        else if(wdonereflector) begin
+            reflected <= 1'b1;
         end
     end
 
@@ -77,7 +87,7 @@ module top(
     );
 
     dff9 DFF1(
-        .clk(clk), .reset_n(reset_n),
+        .clk(clk), .reset_n(dff_reset),
         .D1(wdone1), .D8(wdout1),
         .Q1(wdone1_valid2), .Q8(wdout1_din2)
     );
@@ -91,13 +101,13 @@ module top(
 
     rotor Rotor2(
         .clk(clk), .reset_n(reset_n), .set(set), .en(en), .rot(1'b1), .dec(dec),
-        .offset(first_offset), .delay(first_delay), .idx_in(second_idx_in),
+        .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in),
         .valid(wvalid2), .din(wdin2),
         .done(wdone2), .dout(wdout2)
     );
 
     dff9 DFF2(
-        .clk(clk), .reset_n(reset_n),
+        .clk(clk), .reset_n(dff_reset),
         .D1(wdone2), .D8(wdout2),
         .Q1(wdone2_valid3), .Q8(wdout2_din3)
     );
@@ -111,12 +121,25 @@ module top(
     
     rotor Rotor3(
         .clk(clk), .reset_n(reset_n), .set(set), .en(en), .rot(1'b1), .dec(dec),
-        .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in),
+        .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in),
         .valid(wvalid3), .din(wdin3),
         .done(wdone3), .dout(wdout3)
     );
 
-    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(wdone3_validreflector), .din(wdout3_dinreflector), .dec(dec), .dout(wdoutreflector), .done(wdonereflector));
+    dff9 DFF3(
+        .clk(clk), .reset_n(dff_reset),
+        .D1(wdone3), .D8(wdout3),
+        .Q1(wdone3_validreflector), .Q8(wdout3_dinreflector)
+    );
+
+    mux9 Mux4(
+        .sel(reflected),
+        .a1(wdone3_validreflector), .a8(wdout3_dinreflector),
+        .b1(1'b0), .b8(8'b00000000),
+        .o1(wvalidreflector), .o8(wdinreflector)
+    );
+
+    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(wvalidreflector), .din(wdinreflector), .dec(dec), .dout(wdoutreflector), .done(wdonereflector));
 
     mux9 MuxOut(
         .sel(reflected),
