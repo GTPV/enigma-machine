@@ -12,12 +12,11 @@ module mux9(
 );
     assign o1 = (a1 & (!sel)) | (b1 & sel);
     assign o8[7] = (a8[7] & (!sel)) | (b8[7] & sel);
-    assign o8[6] = (a8[6] & (!sel)) | (b8[7] & sel);
-    assign o8[5] = (a8[5] & (!sel)) | (b8[7] & sel);
-    assign o8[4] = (a8[4] & (!sel)) | (b8[7] & sel);
-    assign o8[3] = (a8[3] & (!sel)) | (b8[7] & sel);
-    assign o8[2] = (a8[2] & (!sel)) | (b8[7] & sel);
-    assign o8[1] = (a8[1] & (!sel)) | (b8[7] & sel);
-    assign o8[0] = (a8[0] & (!sel)) | (b8[7] & sel);
-
+    assign o8[6] = (a8[6] & (!sel)) | (b8[6] & sel);
+    assign o8[5] = (a8[5] & (!sel)) | (b8[5] & sel);
+    assign o8[4] = (a8[4] & (!sel)) | (b8[4] & sel);
+    assign o8[3] = (a8[3] & (!sel)) | (b8[3] & sel);
+    assign o8[2] = (a8[2] & (!sel)) | (b8[2] & sel);
+    assign o8[1] = (a8[1] & (!sel)) | (b8[1] & sel);
+    assign o8[0] = (a8[0] & (!sel)) | (b8[0] & sel);
 endmodule
