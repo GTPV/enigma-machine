@@ -53,9 +53,9 @@ module top(
     wire [7:0] wdout3_dinreflector;
     wire wdone3_validreflector;
 
-    wire dff_reset;
+    wire dff_reset_n;
 
-    assign dff_reset = !((!reset_n) | valid | done);
+    assign dff_reset_n = !((!reset_n) | valid | done);
 
 
     reg reflected;
@@ -87,7 +87,7 @@ module top(
     );
 
     dff9 DFF1(
-        .clk(clk), .reset_n(dff_reset),
+        .clk(clk), .reset_n(dff_reset_n),
         .D1(wdone1), .D8(wdout1),
         .Q1(wdone1_valid2), .Q8(wdout1_din2)
     );
@@ -107,7 +107,7 @@ module top(
     );
 
     dff9 DFF2(
-        .clk(clk), .reset_n(dff_reset),
+        .clk(clk), .reset_n(dff_reset_n),
         .D1(wdone2), .D8(wdout2),
         .Q1(wdone2_valid3), .Q8(wdout2_din3)
     );
@@ -127,7 +127,7 @@ module top(
     );
 
     dff9 DFF3(
-        .clk(clk), .reset_n(dff_reset),
+        .clk(clk), .reset_n(dff_reset_n),
         .D1(wdone3), .D8(wdout3),
         .Q1(wdone3_validreflector), .Q8(wdout3_dinreflector)
     );
