@@ -106,6 +106,9 @@ module rotor(
                     if(dec == 0) nxt <= S1;
                     else nxt <= S3;
                 end
+                else begin
+                    nxt <= S0;
+                end
             end
             S1 : begin
                 if(Delaycnt + 2 >= delay) begin
