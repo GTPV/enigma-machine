@@ -24,64 +24,105 @@ module top(
     input [207:0] reflector_idx_in
 );
 
-    wire done_1, done_2, done_3, done_11, done_22, done_33;   
-    //done_11 = Done
-    wire done_reflector;
+    wire [7:0] wdin1;
+    wire wvalid1;
+    wire [7:0] wdout1;
+    wire wdone1;
 
-    wire [7:0] dout_1;
-    wire [7:0] dout_2;
-    wire [7:0] dout_3;
-    wire [7:0] dout_11;
-    wire [7:0] dout_22;
-    wire [7:0] dout_33;
-    //dout_11 = dout
-    wire [7:0] dout_reflector;
+    wire [7:0] wdin2;
+    wire wvalid2;
+    wire [7:0] wdout2;
+    wire wdone2;
 
-    reg [7:0] Dout_1;
-    reg [7:0] Dout_2;
-    reg [7:0] Dout_3;
-    reg [7:0] Dout_33;
-    reg [7:0] Dout_22;
-    reg [7:0] Dout_11;
+    wire [7:0] wdin3;
+    wire wvalid3;
+    wire [7:0] wdout3;
+    wire wdone3;
 
+    wire [7:0] wdoutreflector;
+    wire wdonereflector;
 
-    rotor Rotor1(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid), .rot(1'b1), .din(din), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout_1), .done(done_1));
+    wire [7;0] wdout1_din2;
+    wire wdone1_valid2;
 
-    wire valid_2;
-    wire [7:0] din_2;
-    dff Done1_valid2(.clk(clk), .reset_n(reset_n), .Q(valid_2), .D(done_1));
-    dff8 Dout1_Din2(.clk(clk), .reset_n(reset_n), .Q(din_2), .D(dout_1));
+    wire [7;0] wdout2_din3;
+    wire wdone2_valid3;
 
-    rotor Rotor2(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_2), .rot(1'b1), .din(din_2), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_2), .done(done_2));
+    wire [7;0] wdout3_dinreflector;
+    wire wdone3_validreflector;
 
-    wire valid_3;
-    wire [7:0] din_3;
-    dff Done2_valid3(.clk(clk), .reset_n(reset_n), .Q(valid_3), .D(done_2));
-    dff8 Dout2_Din3(.clk(clk), .reset_n(reset_n), .Q(din_3), .D(dout_2));
+    reg reflected;
 
-    rotor Rotor3(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_3), .rot(1'b1), .din(din_3), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_3), .done(done_3));
+    always @(posedge valid or posedge wdone3_validreflector) begin
+        if(valid == 1) begin
+            reflected <= 0;
+        end
+        else if(wdone3_validreflector) begin
+            reflected <= 1;
+        end
+    end
 
-    wire valid_reflector;
-    wire [7:0] din_reflector;
-    dff Done3_validReflector(.clk(clk), .reset_n(reset_n), .Q(valid_reflector), .D(done_3));
-    dff8 Dout3_DinReflector(.clk(clk), .reset_n(reset_n), .Q(din_reflector), .D(dout_3));
+    mux9 Mux1(
+        .sel(reflected),
+        .a1(valid), .a8(din),
+        .b1(wdone2_valid3), .b8(wdout2_din3),
+        .o1(wvalid1), .o8(wdin1)
+    );
 
-    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(valid_reflector), .din(din_reflector), .dec(dec), .dout(dout_reflector), .done(done_reflector));
+    rotor Rotor1(
+        .clk(clk), .reset_n(reset_n), .set(set), .en(en), .rot(1'b1), .dec(dec),
+        .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in),
+        .valid(wvalid1), .din(wdin1),
+        .done(wdone1), .dout(wdout1)
+    );
 
-    rotor Rotor33(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(done_reflector), .rot(1'b1), .din(dout_reflector), .offset(third_offset), .delay(third_delay), .idx_in(third_idx_in), .dec(dec), .dout(dout_33), .done(done_33));
+    dff9 DFF1(
+        .clk(clk), .reset_n(reset_n),
+        .D1(wdone1), .D8(wdout1),
+        .Q1(wdone1_valid2), .Q8(wdout1_din2)
+    );
 
-    wire valid_22;
-    wire [7:0] din_22;
-    dff Done33_valid22(.clk(clk), .reset_n(reset_n), .Q(valid_22), .D(done_33));
-    dff8 Dout33_Din22(.clk(clk), .reset_n(reset_n), .Q(din_22), .D(dout_33));
+    mux9 Mux2(
+        .sel(reflected),
+        .a1(wdone1_valid2), .a8(wdout1_din2),
+        .b1(wdone3_validreflector), .b8(wdout3_dinreflector),
+        .o1(wvalid2), .o8(wdin2)
+    );
 
-    rotor Rotor22(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_22), .rot(1'b1), .din(din_22), .offset(second_offset), .delay(second_delay), .idx_in(second_idx_in), .dec(dec), .dout(dout_22), .done(done_22));
+    rotor Rotor2(
+        .clk(clk), .reset_n(reset_n), .set(set), .en(en), .rot(1'b1), .dec(dec),
+        .offset(first_offset), .delay(first_delay), .idx_in(second_idx_in),
+        .valid(wvalid2), .din(wdin2),
+        .done(wdone2), .dout(wdout2)
+    );
 
-    wire valid_11;
-    wire [7:0] din_11;
-    dff Done22_valid11(.clk(clk), .reset_n(reset_n), .Q(valid_11), .D(done_22));
-    dff8 Dout22_Din11(.clk(clk), .reset_n(reset_n), .Q(din_11), .D(dout_22));
+    dff9 DFF2(
+        .clk(clk), .reset_n(reset_n),
+        .D1(wdone2), .D8(wdout2),
+        .Q1(wdone2_valid3), .Q8(wdout2_din3)
+    );
 
-    rotor Rotor11(.clk(clk), .reset_n(reset_n), .set(set), .en(en), .valid(valid_11), .rot(1'b1), .din(din_11), .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in), .dec(dec), .dout(dout), .done(done));
+    mux9 Mux3(
+        .sel(reflected),
+        .a1(wdone2_valid3), .a8(wdout2_din3),
+        .b1(wdonereflector), .b8(wdoutreflector),
+        .o1(wvalid3), .o8(wdin3)
+    );
+    
+    rotor Rotor3(
+        .clk(clk), .reset_n(reset_n), .set(set), .en(en), .rot(1'b1), .dec(dec),
+        .offset(first_offset), .delay(first_delay), .idx_in(first_idx_in),
+        .valid(wvalid3), .din(wdin3),
+        .done(wdone3), .dout(wdout3)
+    );
+
+    reflector Reflector(.clk(clk), .reset_n(reset_n), .set(set), .idx_in(reflector_idx_in), .valid(wdone3_validreflector), .din(wdout3_dinreflector), .dec(dec), .dout(wdoutreflector), .done(wdonereflector));
+
+    mux9 MuxOut(
+        .sel(reflected),
+        .a1(1'b0), .a8(8'b00000000),
+        .b1(wdone1), .b8(wdout1),
+        .o1(done), .o8(dout)
+    );
 
 endmodule
