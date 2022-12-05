@@ -55,7 +55,7 @@ module top(
 
     wire dff_reset;
 
-    assign dff_reset = !((!reset_n) | valid);
+    assign dff_reset = !((!reset_n) | valid | done);
 
 
     reg reflected;
