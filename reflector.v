@@ -13,7 +13,6 @@ module reflector(
     output reg done
 );
     reg [207:0] Idx_in;
-    reg [7:0] out_reg;
     reg [31:0] Din;
 
     integer i;
