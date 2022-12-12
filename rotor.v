@@ -194,7 +194,7 @@ module rotor(
 
             S3 : begin
                 done <= 0;
-				dout <= 8'b00000000;
+                dout <= 8'b00000000;
             end
 
             S4 : begin
