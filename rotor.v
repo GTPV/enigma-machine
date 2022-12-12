@@ -102,29 +102,60 @@ module rotor(
     always @(*) begin
         case(cur)
             S0 : begin
+                decrypted <= 1'b0;
                 if(valid) begin
-                    if(dec == 0) nxt <= S1;
-                    else nxt <= S3;
+                    if(dec == 0) begin
+                        nxt <= S1;
+                    end
+                    else begin
+                        nxt <= S3;
+                    end
                 end
                 else begin
                     nxt <= S0;
                 end
             end
             S1 : begin
-                if(Delaycnt + 2 >= delay) begin
+                if(Delaycnt + 1 >= delay) begin
                     nxt <= S2;
                 end
             end
             S2 : begin
-                nxt <= S0;
+                if(valid&(!dec)) begin
+                    nxt <= S1;
+                end
+                else if(valid&(dec)) begin
+                    nxt <= S3;
+                end
+                else nxt <= S0;
             end
             S3 : begin
-                if(Delaycnt + 2 >= delay) begin
+                if(!decrypted) begin
+                    for(i = 0; i < 26; i = i+1) begin
+                        if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
+                            if(i >= (Shifted + Offset)) begin
+                                Sel <= i - (Shifted + Offset) + 65;
+                            end
+                            else begin
+                                Sel <= 26 + i - (Shifted + Offset) + 65;
+                            end
+                        end
+                    end
+                    decrypted <= 1'b1;
+                end
+                if(Delaycnt + 1 >= delay) begin
                     nxt <= S4;
                 end
             end
             S4 : begin
-                nxt <= S0;
+                decrypted <= 0;
+                if(valid&(!dec)) begin
+                    nxt <= S1;
+                end
+                else if(valid&(dec)) begin
+                    nxt <= S3;
+                end
+                else nxt <= S0;
             end
             default: ;
         endcase
@@ -132,12 +163,11 @@ module rotor(
 
     //Moore Output
     always @(*) begin
-        case(cur)
+        case(nxt)
 
             S0 : begin
                 done <= 0;
                 dout <= 8'b00000000;
-                decrypted <= 1'b0;
                 Sel <= 0;
             end
 
@@ -163,19 +193,6 @@ module rotor(
             end
 
             S3 : begin
-                if(!decrypted) begin
-                    for(i = 0; i < 26; i = i+1) begin
-                        if(Din[7:0] == Idx_in[200-(i*8) +: 8]) begin
-                            if(i >= (Shifted + Offset)) begin
-                                Sel <= i - (Shifted + Offset) + 65;
-                            end
-                            else begin
-                                Sel <= 26 + i - (Shifted + Offset) + 65;
-                            end
-                        end
-                    end
-                    decrypted <= 1'b1;
-                end
                 done <= 0;
             end
 
