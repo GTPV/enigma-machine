@@ -103,6 +103,7 @@ module rotor(
         case(cur)
             S0 : begin
                 decrypted <= 1'b0;
+				Sel <= 8'b00000000;
                 if(valid) begin
                     if(dec == 0) begin
                         nxt <= S1;
@@ -168,7 +169,6 @@ module rotor(
             S0 : begin
                 done <= 0;
                 dout <= 8'b00000000;
-                Sel <= 0;
             end
 
             S1 : begin
